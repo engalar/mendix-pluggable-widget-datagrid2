@@ -1,6 +1,6 @@
 {
-  "name": "graph",
-  "widgetName": "Graph",
+  "name": "datagrid2",
+  "widgetName": "DataGrid2",
   "version": "1.0.0",
   "description": "My widget description",
   "packagePath": "mendixcn",
