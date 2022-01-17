@@ -6,6 +6,7 @@ import {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState
 } from "react";
 import { ColumnSelector } from "./ColumnSelector";
@@ -17,6 +18,7 @@ import { EditableValue, ObjectItem } from "mendix";
 import { SortingRule, useSettings } from "../utils/settings";
 import { ColumnResizer } from "./ColumnResizer";
 import { InfiniteBody, Pagination } from "../piw-utils-internal/components/web";
+import { useMxContext } from "../patch/useMxContext";
 
 export type TableColumn = Omit<
     ColumnsPreviewType,
@@ -79,6 +81,10 @@ export interface ColumnProperty {
 }
 
 export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement {
+    const ref = useRef<any>();
+    const obj = useMxContext(ref);
+    console.log(obj?.getGuid());
+
     const isInfinite = !props.paging;
     const [isDragging, setIsDragging] = useState(false);
     const [dragOver, setDragOver] = useState("");
@@ -159,35 +165,35 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
         (column: ColumnProperty, value: T, rowIndex: number) =>
             visibleColumns.find(c => c.id === column.id) || props.preview
                 ? props.cellRenderer(
-                      (children, className, onClick) => {
-                          return (
-                              <div
-                                  key={`row_${value.id}_cell_${column.id}`}
-                                  className={classNames("td", { "td-borders": rowIndex === 0 }, className, {
-                                      clickable: !!onClick,
-                                      "hidden-column-preview": props.preview && props.columnsHidable && column.hidden
-                                  })}
-                                  onClick={onClick}
-                                  onKeyDown={
-                                      onClick
-                                          ? e => {
-                                                if (e.key === "Enter" || e.key === " ") {
-                                                    e.preventDefault();
-                                                    onClick();
-                                                }
+                    (children, className, onClick) => {
+                        return (
+                            <div
+                                key={`row_${value.id}_cell_${column.id}`}
+                                className={classNames("td", { "td-borders": rowIndex === 0 }, className, {
+                                    clickable: !!onClick,
+                                    "hidden-column-preview": props.preview && props.columnsHidable && column.hidden
+                                })}
+                                onClick={onClick}
+                                onKeyDown={
+                                    onClick
+                                        ? e => {
+                                            if (e.key === "Enter" || e.key === " ") {
+                                                e.preventDefault();
+                                                onClick();
                                             }
-                                          : undefined
-                                  }
-                                  role={onClick ? "button" : "cell"}
-                                  tabIndex={onClick ? 0 : undefined}
-                              >
-                                  {children}
-                              </div>
-                          );
-                      },
-                      value,
-                      Number(column.id)
-                  )
+                                        }
+                                        : undefined
+                                }
+                                role={onClick ? "button" : "cell"}
+                                tabIndex={onClick ? 0 : undefined}
+                            >
+                                {children}
+                            </div>
+                        );
+                    },
+                    value,
+                    Number(column.id)
+                )
                 : null,
         [props.cellRenderer, props.columnsHidable, props.preview, visibleColumns]
     );
@@ -230,7 +236,7 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
     }, [columnsWidth, visibleColumns, props.columnsHidable]);
 
     return (
-        <div className={props.className} style={props.styles}>
+        <div ref={ref} className={props.className} style={props.styles}>
             <div className="table" role="table">
                 <div className="table-header" role="rowgroup">
                     {props.pagingPosition === "top" && pagination}
