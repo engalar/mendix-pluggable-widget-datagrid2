@@ -2,3 +2,10 @@
 Place your custom CSS here
 */
 // @import "../../node_modules/antd/dist/antd";
+
+.table {
+    .selected {
+        background: #e6f7ff !important;
+        border-color: #00000008;
+    }
+}

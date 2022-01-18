@@ -83,6 +83,7 @@ export interface DataGrid2ContainerProps {
     emptyPlaceholder?: ReactNode;
     rowClass?: ListExpressionValue<string>;
     onClick?: ListActionValue;
+    selectRefPath: string;
     columnsSortable: boolean;
     columnsResizable: boolean;
     columnsDraggable: boolean;
@@ -111,6 +112,7 @@ export interface DataGrid2PreviewProps {
     emptyPlaceholder: { widgetCount: number; renderer: ComponentType<{ caption?: string }> };
     rowClass: string;
     onClick: {} | null;
+    selectRefPath: string;
     columnsSortable: boolean;
     columnsResizable: boolean;
     columnsDraggable: boolean;

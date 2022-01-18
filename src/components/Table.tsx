@@ -1,12 +1,13 @@
 import {
     createElement,
     CSSProperties,
+    forwardRef,
+    MutableRefObject,
     ReactElement,
     ReactNode,
     useCallback,
     useEffect,
     useMemo,
-    useRef,
     useState
 } from "react";
 import { ColumnSelector } from "./ColumnSelector";
@@ -18,7 +19,6 @@ import { EditableValue, ObjectItem } from "mendix";
 import { SortingRule, useSettings } from "../utils/settings";
 import { ColumnResizer } from "./ColumnResizer";
 import { InfiniteBody, Pagination } from "../piw-utils-internal/components/web";
-import { useMxContext } from "../patch/useMxContext";
 
 export type TableColumn = Omit<
     ColumnsPreviewType,
@@ -80,11 +80,7 @@ export interface ColumnProperty {
     weight: number;
 }
 
-export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement {
-    const ref = useRef<any>();
-    const obj = useMxContext(ref);
-    console.log(obj?.getGuid());
-
+const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<any>): ReactElement => {
     const isInfinite = !props.paging;
     const [isDragging, setIsDragging] = useState(false);
     const [dragOver, setDragOver] = useState("");
@@ -336,6 +332,8 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
         </div>
     );
 }
+
+export const Table = forwardRef(tt);
 
 function sortColumns(columnsOrder: string[], columnA: ColumnProperty, columnB: ColumnProperty): number {
     let columnAValue = columnsOrder.findIndex(c => c === columnA.id);

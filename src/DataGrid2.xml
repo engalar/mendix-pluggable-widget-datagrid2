@@ -173,6 +173,10 @@
                     <caption>On click action</caption>
                     <description />
                 </property>
+                <property key="selectRefPath" type="string" required="false" multiline="false">
+                    <caption>多选引用集</caption>
+                    <description>示例字符串 ModuleName.RefSetName</description>
+                </property>
             </propertyGroup>
         </propertyGroup>
         <propertyGroup caption="Personalization">
