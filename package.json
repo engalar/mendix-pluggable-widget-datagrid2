@@ -7,7 +7,9 @@
   "author": "wengao.liu@siemens.com",
   "dependencies": {
     "ahooks": "^2.10.14",
-    "classnames": "^2.2.6"
+    "classnames": "^2.2.6",
+    "antd": "^4.18.4",
+    "lodash-es": "^4.17.21"
   },
   "scripts": {
     "m": "npm install -g cnpm rollup prettier eslint --registry=https://registry.npmmirror.com",

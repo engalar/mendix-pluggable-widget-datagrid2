@@ -1,13 +1,12 @@
 import {
     createElement,
     CSSProperties,
-    forwardRef,
-    MutableRefObject,
     ReactElement,
     ReactNode,
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState
 } from "react";
 import { ColumnSelector } from "./ColumnSelector";
@@ -19,6 +18,10 @@ import { EditableValue, ObjectItem } from "mendix";
 import { SortingRule, useSettings } from "../utils/settings";
 import { ColumnResizer } from "./ColumnResizer";
 import { InfiniteBody, Pagination } from "../piw-utils-internal/components/web";
+import { Checkbox } from "antd";
+import { usePrevious, useSelections } from "ahooks";
+import { useMxContext } from "../patch/useMxContext";
+import { difference } from "lodash-es";
 
 export type TableColumn = Omit<
     ColumnsPreviewType,
@@ -32,6 +35,8 @@ export type CellRenderer<T extends ObjectItem = ObjectItem> = (
 ) => ReactElement;
 
 export interface TableProps<T extends ObjectItem> {
+    selectRefPath?: string;
+    onClick?: (guid: string) => void;
     cellRenderer: CellRenderer<T>;
     className: string;
     columns: TableColumn[];
@@ -80,7 +85,32 @@ export interface ColumnProperty {
     weight: number;
 }
 
-const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<any>): ReactElement => {
+export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement {
+    const ref = useRef<any>();
+    const list = useMemo(() => props.data.map(d => d.id), [props.data]);
+    const { toggle, isSelected, selected, allSelected, partiallySelected, toggleAll } = useSelections<string>(list, []);
+    const preSelected = usePrevious(selected);
+    const obj = useMxContext(ref);
+    useEffect(() => {
+        if ((preSelected ?? []).length === selected.length) {
+            return;
+        }
+        let guid: string;
+        if (props.selectRefPath && obj) {
+            obj.set(props.selectRefPath, selected);
+        }
+
+        if (props.onClick) {
+            if ((preSelected ?? []).length < selected.length) {
+                guid = difference(selected, preSelected ?? [])[0];
+            } else {
+                guid = difference(preSelected ?? [], selected)[0];
+            }
+
+            props.onClick(guid);
+        }
+    }, [selected, preSelected, obj]);
+
     const isInfinite = !props.paging;
     const [isDragging, setIsDragging] = useState(false);
     const [dragOver, setDragOver] = useState("");
@@ -227,7 +257,7 @@ const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<an
             })
             .join(" ");
         return {
-            gridTemplateColumns: columnSizes + (props.columnsHidable ? " fit-content(50px)" : "")
+            gridTemplateColumns: `fit-content(1px) ${columnSizes}${props.columnsHidable ? " fit-content(50px)" : ""}`
         };
     }, [columnsWidth, visibleColumns, props.columnsHidable]);
 
@@ -251,6 +281,10 @@ const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<an
                     style={cssGridStyles}
                 >
                     <div className="tr" role="row">
+                        <div className="th column-check">
+                            <Checkbox checked={allSelected} onClick={toggleAll} indeterminate={partiallySelected}>
+                            </Checkbox>
+                        </div>
                         {visibleColumns.map(column =>
                             props.headerWrapperRenderer(
                                 Number(column.id),
@@ -299,9 +333,13 @@ const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<an
                         return (
                             <div
                                 key={`row_${row.item.id}`}
-                                className={classNames("tr", props.rowClass?.(row.item))}
+                                className={classNames("tr", props.rowClass?.(row.item), { selected: isSelected(row.item.id) })}
+                                onClick={() => toggle(row.item.id)}
                                 role="row"
                             >
+                                <div className={classNames("td column-check", { "td-borders": rowIndex === 0 })}>
+                                    <Checkbox checked={isSelected(row.item.id)}></Checkbox>
+                                </div>
                                 {visibleColumns.map(cell => renderCell(cell, row.item, rowIndex))}
                                 {props.columnsHidable && (
                                     <div
@@ -332,8 +370,6 @@ const tt = <T extends ObjectItem>(props: TableProps<T>, ref: MutableRefObject<an
         </div>
     );
 }
-
-export const Table = forwardRef(tt);
 
 function sortColumns(columnsOrder: string[], columnA: ColumnProperty, columnB: ColumnProperty): number {
     let columnAValue = columnsOrder.findIndex(c => c === columnA.id);

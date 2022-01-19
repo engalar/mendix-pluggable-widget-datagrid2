@@ -1,25 +1,13 @@
 import { createElement, useCallback } from "react";
-import { ListActionValue } from "mendix";
 import { CellRenderer } from "../components/Table";
 import { ColumnsType } from "../../typings/DataGrid2Props";
 import classNames from "classnames";
-import { executeAction } from "../piw-utils-internal";
-import { useSelections } from "ahooks";
 
 interface CellRendererHookProps {
     columns: ColumnsType[];
-    onClick?: ListActionValue;
-    context?: mendix.lib.MxObject;
-    list: string[];
-    selectRefPath: string,
 }
 
-export function useCellRenderer({ onClick, columns, context, list, selectRefPath }: CellRendererHookProps): CellRenderer {
-    const { isSelected, toggle } = useSelections(
-        list,
-        [],
-    );
-
+export function useCellRenderer({ columns }: CellRendererHookProps): CellRenderer {
     const renderer: CellRenderer = (renderWrapper, value, columnIndex) => {
         const column = columns[columnIndex];
         const title = column.tooltip && column.tooltip.get(value)?.value;
@@ -44,25 +32,10 @@ export function useCellRenderer({ onClick, columns, context, list, selectRefPath
         return renderWrapper(
             content,
             classNames(`align-column-${column.alignment}`, column.columnClass?.get(value)?.value, {
-                "wrap-text": column.wrapText,
-                "selected": isSelected(value.id)
-            }),
-            () => {
-                if (context && selectRefPath) {
-                    if (isSelected(value.id)) {
-                        context.removeReferences(selectRefPath, [value.id]);
-                    } else {
-                        context.addReferences(selectRefPath, [value.id]);
-                    }
-                    toggle(value.id);
-                }
-                if (onClick) {
-                    executeAction(onClick?.get(value));
-                }
-            });
+                "wrap-text": column.wrapText
+            })
+        );
     };
 
-
-
-    return useCallback(renderer, [columns, onClick, context, list]);
+    return useCallback(renderer, [columns]);
 }

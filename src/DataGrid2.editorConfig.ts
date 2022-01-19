@@ -205,7 +205,7 @@ export const getPreview = (values: DataGrid2PreviewProps, isDarkMode: boolean): 
                 children: [
                     {
                         type: "Text",
-                        content: "Data grid 2",
+                        content: "Data grid 3",
                         fontColor: isDarkMode ? "#6DB1FE" : "#2074C8"
                     }
                 ]

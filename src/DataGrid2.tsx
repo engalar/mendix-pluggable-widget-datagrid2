@@ -2,6 +2,7 @@ import { createElement, ReactElement, useCallback, useEffect, useMemo, useRef, u
 import { ColumnsType, DataGrid2ContainerProps } from "../typings/DataGrid2Props";
 import { FilterCondition } from "mendix/filters";
 import { and } from "mendix/filters/builders";
+import { ValueStatus } from "mendix";
 
 import { Table, TableColumn } from "./components/Table";
 import {
@@ -11,20 +12,14 @@ import {
     useFilterContext,
     useMultipleFiltering
 } from "./piw-utils-internal/components/web";
-import { isAvailable } from "./piw-utils-internal";
+import { executeAction, isAvailable } from "./piw-utils-internal";
 import { extractFilters } from "./utils/filters";
 import { useCellRenderer } from "./utils/useCellRenderer";
 
 import "./ui/index.scss";
-import { useMxContext } from "./patch/useMxContext";
 
 export default function (props: DataGrid2ContainerProps): ReactElement {
     const id = useRef(`DataGrid${generateUUID()}`);
-
-    const list = useMemo(() => (props.datasource.items ?? []).map(d => d.id), [props.datasource]);
-
-    const ref = useRef<any>();
-    const obj = useMxContext(ref);
 
     const [sortParameters, setSortParameters] = useState<{ columnIndex: number; desc: boolean } | undefined>(undefined);
     const isInfiniteLoad = props.pagination === "virtualScrolling";
@@ -35,7 +30,7 @@ export default function (props: DataGrid2ContainerProps): ReactElement {
     const [filtered, setFiltered] = useState(false);
     const multipleFilteringState = useMultipleFiltering();
     const { FilterContext } = useFilterContext();
-    const cellRenderer = useCellRenderer({ columns: props.columns, onClick: props.onClick, context: obj, list, selectRefPath: props.selectRefPath });
+    const cellRenderer = useCellRenderer({ columns: props.columns });
 
     useEffect(() => {
         props.datasource.requestTotalCount(true);
@@ -111,9 +106,20 @@ export default function (props: DataGrid2ContainerProps): ReactElement {
         [props.filterList, viewStateFilters.current]
     );
 
+    const onClick = useCallback((guid: string) => {
+        if (props.onClick && props.datasource.status === ValueStatus.Available) {
+            const value = props.datasource.items?.find(d => d.id === guid);
+            if (value) {
+                executeAction(props.onClick.get(value));
+            }
+        }
+    }, [props.onClick, props.datasource]);
+
+
     return (
         <Table
-            ref={ref}
+            selectRefPath={props.selectRefPath}
+            onClick={onClick}
             cellRenderer={cellRenderer}
             className={props.class}
             columns={columns}
