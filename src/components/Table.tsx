@@ -88,25 +88,29 @@ export interface ColumnProperty {
 export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement {
     const ref = useRef<any>();
     const list = useMemo(() => props.data.map(d => d.id), [props.data]);
-    const { toggle, isSelected, selected, allSelected, partiallySelected, toggleAll } = useSelections<string>(list, []);
+    const { toggle, isSelected, setSelected, selected, allSelected, partiallySelected, toggleAll } = useSelections<string>(list, []);
     const preSelected = usePrevious(selected);
     const obj = useMxContext(ref);
     useEffect(() => {
-        if ((preSelected ?? []).length === selected.length) {
-            return;
-        }
         let guid: string;
-        if (props.selectRefPath && obj) {
-            obj.set(props.selectRefPath, selected);
-        }
+        if (!props.selectRefPath) {
+            guid = selected[0];
+        } else {
+            if ((preSelected ?? []).length === selected.length) {
+                return;
+            }
+            if (props.selectRefPath && obj) {
+                obj.set(props.selectRefPath, selected);
+            }
 
-        if (props.onClick) {
             if ((preSelected ?? []).length < selected.length) {
                 guid = difference(selected, preSelected ?? [])[0];
             } else {
                 guid = difference(preSelected ?? [], selected)[0];
             }
+        }
 
+        if (props.onClick) {
             props.onClick(guid);
         }
     }, [selected, preSelected, obj]);
@@ -257,7 +261,7 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
             })
             .join(" ");
         return {
-            gridTemplateColumns: `fit-content(1px) ${columnSizes}${props.columnsHidable ? " fit-content(50px)" : ""}`
+            gridTemplateColumns: `${props.selectRefPath ? 'fit-content(1px) ' : ''}${columnSizes}${props.columnsHidable ? " fit-content(50px)" : ""}`
         };
     }, [columnsWidth, visibleColumns, props.columnsHidable]);
 
@@ -281,10 +285,10 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
                     style={cssGridStyles}
                 >
                     <div className="tr" role="row">
-                        <div className="th column-check">
+                        {props.selectRefPath && <div className="th column-check">
                             <Checkbox checked={allSelected} onClick={toggleAll} indeterminate={partiallySelected}>
                             </Checkbox>
-                        </div>
+                        </div>}
                         {visibleColumns.map(column =>
                             props.headerWrapperRenderer(
                                 Number(column.id),
@@ -334,12 +338,12 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
                             <div
                                 key={`row_${row.item.id}`}
                                 className={classNames("tr", props.rowClass?.(row.item), { selected: isSelected(row.item.id) })}
-                                onClick={() => toggle(row.item.id)}
+                                onClick={() => props.selectRefPath ? toggle(row.item.id) : setSelected([row.item.id])}
                                 role="row"
                             >
-                                <div className={classNames("td column-check", { "td-borders": rowIndex === 0 })}>
+                                {props.selectRefPath && <div className={classNames("td column-check", { "td-borders": rowIndex === 0 })}>
                                     <Checkbox checked={isSelected(row.item.id)}></Checkbox>
-                                </div>
+                                </div>}
                                 {visibleColumns.map(cell => renderCell(cell, row.item, rowIndex))}
                                 {props.columnsHidable && (
                                     <div

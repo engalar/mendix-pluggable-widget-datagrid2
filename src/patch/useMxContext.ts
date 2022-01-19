@@ -20,5 +20,5 @@ export const useMxContext = (ref: RefObject<any>): mendix.lib.MxObject | undefin
         { immediate: true }
     );
 
-    return objs ? objs[0][0][1].value.value : undefined;
+    return objs && objs[0] ? objs[0][0][1].value.value : undefined;
 };
