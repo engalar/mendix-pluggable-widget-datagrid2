@@ -11,3 +11,5 @@ curl https://gitee.com/engalar/mendix-pluggable-widget-datagrid2/raw/master/scri
 ```cmd
 curl https://gitee.com/engalar/mendix-pluggable-widget-datagrid2/raw/master/script/try_pw.bat -o temp2 && type temp2 | more /p > try_pw.bat && del /f temp2 && call try_pw.bat
 ```
+
+![image](https://user-images.githubusercontent.com/2411314/161362799-926bcc84-27af-4a71-8fc9-3e05bcec8c90.png)
