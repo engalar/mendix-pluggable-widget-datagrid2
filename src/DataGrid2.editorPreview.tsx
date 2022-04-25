@@ -15,25 +15,25 @@ export function preview(props: DataGrid2PreviewProps): ReactElement {
         props.columns.length > 0
             ? props.columns
             : [
-                {
-                    header: "Column",
-                    tooltip: "",
-                    attribute: "[No attribute selected]",
-                    width: "autoFill",
-                    columnClass: "",
-                    filter: { renderer: () => <div />, widgetCount: 0 },
-                    resizable: false,
-                    showContentAs: "attribute",
-                    content: { renderer: () => <div />, widgetCount: 0 },
-                    dynamicText: "Dynamic Text",
-                    draggable: false,
-                    hidable: "no",
-                    size: 1,
-                    sortable: false,
-                    alignment: "left",
-                    wrapText: false
-                }
-            ];
+                  {
+                      header: "Column",
+                      tooltip: "",
+                      attribute: "[No attribute selected]",
+                      width: "autoFill",
+                      columnClass: "",
+                      filter: { renderer: () => <div />, widgetCount: 0 },
+                      resizable: false,
+                      showContentAs: "attribute",
+                      content: { renderer: () => <div />, widgetCount: 0 },
+                      dynamicText: "Dynamic Text",
+                      draggable: false,
+                      hidable: "no",
+                      size: 1,
+                      sortable: false,
+                      alignment: "left",
+                      wrapText: false
+                  }
+              ];
 
     const selectableWrapperRenderer = useCallback(
         (columnIndex: number, header: ReactElement) => {

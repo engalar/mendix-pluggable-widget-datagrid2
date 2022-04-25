@@ -1,3 +1,4 @@
+const mx = window.mx;
 function getEnclosingWidget(registry: any, ele: any) {
     const objs: any = [];
     const pendingDataView = [];
@@ -16,28 +17,26 @@ function getEnclosingWidget(registry: any, ele: any) {
             console.log(ele.parentElement.lastElementChild.getAttribute("data-mendix-id"));
 
             const w1 = registry.byId(ele.parentElement.lastElementChild.getAttribute("widgetid"));
-            let pre = ele.parentElement.lastElementChild
+            const pre = ele.parentElement.lastElementChild
                 .getAttribute("data-mendix-id")
                 .split(".")
                 .slice(0, -1)
                 .join(".");
 
             pendingDataView.forEach(dv => {
-                //@ts-ignore
+                // @ts-ignore
                 if (mx.version.split(".")[0] === "9") {
                     // objs.push(w1._storeBackend.get$(`${pre}.${dv}`, `object`, "*;"));
                     objs.push(w1._storeBackend.recordGroups.get(`object»${pre}.${dv}`));
                 }
-                //@ts-ignore
+                // @ts-ignore
                 else if (mx.version.split(".")[0] === "8") {
                     const oi = w1._store.entries[`{"widgetId":"${pre}.${dv}","slot":"object"}`].get$();
                     objs.push(oi);
-                } else {
                 }
             });
         }
         if (ele.parentElement.getAttribute("widgetid")) {
-            debugger;
             console.log(ele.parentElement.getAttribute("widgetid"));
             console.log(ele.parentElement.getAttribute("data-mendix-id"));
         }
@@ -51,7 +50,7 @@ function getEnclosingWidget(registry: any, ele: any) {
 }
 
 export default (ele: any, cb: (objs: any[]) => void) => {
-    //@ts-ignore
+    // @ts-ignore
     window.require(["dijit/registry"], (registry: any) => {
         cb(getEnclosingWidget(registry, ele));
     });

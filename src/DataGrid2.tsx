@@ -106,15 +106,17 @@ export default function (props: DataGrid2ContainerProps): ReactElement {
         [props.filterList, viewStateFilters.current]
     );
 
-    const onClick = useCallback((guid: string) => {
-        if (props.onClick && props.datasource.status === ValueStatus.Available) {
-            const value = props.datasource.items?.find(d => d.id === guid);
-            if (value) {
-                executeAction(props.onClick.get(value));
+    const onClick = useCallback(
+        (guid: string) => {
+            if (props.onClick && props.datasource.status === ValueStatus.Available) {
+                const value = props.datasource.items?.find(d => d.id === guid);
+                if (value) {
+                    executeAction(props.onClick.get(value));
+                }
             }
-        }
-    }, [props.onClick, props.datasource]);
-
+        },
+        [props.onClick, props.datasource]
+    );
 
     return (
         <Table
@@ -216,4 +218,3 @@ function transformColumnProps(props: ColumnsType[]): TableColumn[] {
         sortable: prop.sortable && (prop.attribute?.sortable ?? false)
     }));
 }
-

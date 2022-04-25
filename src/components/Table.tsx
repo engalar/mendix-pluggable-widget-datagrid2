@@ -88,7 +88,8 @@ export interface ColumnProperty {
 export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement {
     const ref = useRef<any>();
     const list = useMemo(() => props.data.map(d => d.id), [props.data]);
-    const { toggle, isSelected, setSelected, selected, allSelected, partiallySelected, toggleAll } = useSelections<string>(list, []);
+    const { toggle, isSelected, setSelected, selected, allSelected, partiallySelected, toggleAll } =
+        useSelections<string>(list, []);
     const preSelected = usePrevious(selected);
     const obj = useMxContext(ref);
     useEffect(() => {
@@ -195,35 +196,35 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
         (column: ColumnProperty, value: T, rowIndex: number) =>
             visibleColumns.find(c => c.id === column.id) || props.preview
                 ? props.cellRenderer(
-                    (children, className, onClick) => {
-                        return (
-                            <div
-                                key={`row_${value.id}_cell_${column.id}`}
-                                className={classNames("td", { "td-borders": rowIndex === 0 }, className, {
-                                    clickable: !!onClick,
-                                    "hidden-column-preview": props.preview && props.columnsHidable && column.hidden
-                                })}
-                                onClick={onClick}
-                                onKeyDown={
-                                    onClick
-                                        ? e => {
-                                            if (e.key === "Enter" || e.key === " ") {
-                                                e.preventDefault();
-                                                onClick();
+                      (children, className, onClick) => {
+                          return (
+                              <div
+                                  key={`row_${value.id}_cell_${column.id}`}
+                                  className={classNames("td", { "td-borders": rowIndex === 0 }, className, {
+                                      clickable: !!onClick,
+                                      "hidden-column-preview": props.preview && props.columnsHidable && column.hidden
+                                  })}
+                                  onClick={onClick}
+                                  onKeyDown={
+                                      onClick
+                                          ? e => {
+                                                if (e.key === "Enter" || e.key === " ") {
+                                                    e.preventDefault();
+                                                    onClick();
+                                                }
                                             }
-                                        }
-                                        : undefined
-                                }
-                                role={onClick ? "button" : "cell"}
-                                tabIndex={onClick ? 0 : undefined}
-                            >
-                                {children}
-                            </div>
-                        );
-                    },
-                    value,
-                    Number(column.id)
-                )
+                                          : undefined
+                                  }
+                                  role={onClick ? "button" : "cell"}
+                                  tabIndex={onClick ? 0 : undefined}
+                              >
+                                  {children}
+                              </div>
+                          );
+                      },
+                      value,
+                      Number(column.id)
+                  )
                 : null,
         [props.cellRenderer, props.columnsHidable, props.preview, visibleColumns]
     );
@@ -261,7 +262,9 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
             })
             .join(" ");
         return {
-            gridTemplateColumns: `${props.selectRefPath ? 'fit-content(1px) ' : ''}${columnSizes}${props.columnsHidable ? " fit-content(50px)" : ""}`
+            gridTemplateColumns: `${props.selectRefPath ? "fit-content(1px) " : ""}${columnSizes}${
+                props.columnsHidable ? " fit-content(50px)" : ""
+            }`
         };
     }, [columnsWidth, visibleColumns, props.columnsHidable]);
 
@@ -285,10 +288,15 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
                     style={cssGridStyles}
                 >
                     <div className="tr" role="row">
-                        {props.selectRefPath && <div className="th column-check">
-                            <Checkbox checked={allSelected} onClick={toggleAll} indeterminate={partiallySelected}>
-                            </Checkbox>
-                        </div>}
+                        {props.selectRefPath && (
+                            <div className="th column-check">
+                                <Checkbox
+                                    checked={allSelected}
+                                    onClick={toggleAll}
+                                    indeterminate={partiallySelected}
+                                ></Checkbox>
+                            </div>
+                        )}
                         {visibleColumns.map(column =>
                             props.headerWrapperRenderer(
                                 Number(column.id),
@@ -337,13 +345,17 @@ export function Table<T extends ObjectItem>(props: TableProps<T>): ReactElement 
                         return (
                             <div
                                 key={`row_${row.item.id}`}
-                                className={classNames("tr", props.rowClass?.(row.item), { selected: isSelected(row.item.id) })}
-                                onClick={() => props.selectRefPath ? toggle(row.item.id) : setSelected([row.item.id])}
+                                className={classNames("tr", props.rowClass?.(row.item), {
+                                    selected: isSelected(row.item.id)
+                                })}
+                                onClick={() => (props.selectRefPath ? toggle(row.item.id) : setSelected([row.item.id]))}
                                 role="row"
                             >
-                                {props.selectRefPath && <div className={classNames("td column-check", { "td-borders": rowIndex === 0 })}>
-                                    <Checkbox checked={isSelected(row.item.id)}></Checkbox>
-                                </div>}
+                                {props.selectRefPath && (
+                                    <div className={classNames("td column-check", { "td-borders": rowIndex === 0 })}>
+                                        <Checkbox checked={isSelected(row.item.id)}></Checkbox>
+                                    </div>
+                                )}
                                 {visibleColumns.map(cell => renderCell(cell, row.item, rowIndex))}
                                 {props.columnsHidable && (
                                     <div
