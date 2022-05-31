@@ -4,7 +4,7 @@
  * @author Mendix UI Content Team
  */
 import { ComponentType, CSSProperties, ReactNode } from "react";
-import { ActionValue, DynamicValue, EditableValue, ListValue, ListActionValue, ListAttributeValue, ListExpressionValue, ListWidgetValue } from "mendix";
+import { DynamicValue, EditableValue, ListValue, ListActionValue, ListAttributeValue, ListExpressionValue, ListWidgetValue } from "mendix";
 import { Big } from "big.js";
 
 export type ShowContentAsEnum = "attribute" | "dynamicText" | "customContent";
@@ -89,7 +89,6 @@ export interface DataGrid2ContainerProps {
     columnsDraggable: boolean;
     columnsHidable: boolean;
     configurationAttribute?: EditableValue<string>;
-    onConfigurationChange?: ActionValue;
     showHeaderFilters: boolean;
     filterList: FilterListType[];
     filtersPlaceholder?: ReactNode;
